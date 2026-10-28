@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vânătorii de cratime</title>
+<style>
+:root{--bg:#fff7e6;--card:#fff;--ink:#2a2140;--muted:#6b5f85;--main:#7c3aed;--acc:#ffb703;--ok:#16a34a;--bad:#e11d48;--line:#f1dcb0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1530;--card:#271f45;--ink:#f3eeff;--muted:#b6a9d6;--main:#a78bfa;--line:#41366b}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif;line-height:1.55;font-size:1.05rem}
+.wrap{max-width:780px;margin:0 auto;padding:16px}
+.hero{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;border-radius:24px;padding:22px;text-align:center}
+.hero h1{margin:4px 0;font-size:1.7rem}
+.hero .big{font-size:2.6rem}
+.hero input{font:inherit;border:0;border-radius:12px;padding:8px;color:#2a2140;width:210px;max-width:100%}
+.vr{margin-top:12px}
+.vr button{background:#ffffff33;color:#fff;margin:0 4px}
+.vr button.on{background:#fff;color:#7c3aed}
+.bar{height:14px;background:var(--line);border-radius:99px;margin:14px 0;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffb703,#fb5607);transition:width .5s}
+.card{background:var(--card);border-radius:20px;padding:18px;margin:14px 0;border:2px solid var(--line)}
+.card h2{margin:6px 0 4px;font-size:1.25rem}
+.tag{display:inline-block;background:var(--acc);color:#2a2140;border-radius:99px;padding:2px 12px;font-weight:700;font-size:.85rem}
+.model{background:var(--bg);border-left:5px solid var(--main);padding:8px 12px;border-radius:10px;margin:8px 0;font-size:.95rem}
+details{margin:6px 0;color:var(--muted);font-size:.95rem}
+summary{cursor:pointer;font-weight:700;color:var(--main)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0;padding:10px;border-radius:14px;background:var(--bg);border:2px solid transparent}
+.row.right{border-color:var(--ok)}.row.wrong{border-color:var(--bad)}
+.row small{flex-basis:100%;font-weight:700}
+.row.right small{color:var(--ok)}.row.wrong small{color:var(--bad)}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:8px 14px;font-weight:700}
+.op{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.op.on{background:var(--main);color:#fff;border-color:var(--main)}
+.go{background:var(--main);color:#fff;margin-top:8px;font-size:1.05rem}
+.go:disabled{opacity:.5}
+select,input.t,textarea{font:inherit;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:10px;padding:6px 8px;max-width:100%}
+input.t{width:150px}
+textarea{width:100%}
+.wr{background:#e11d4825;color:var(--bad);border-radius:6px;padding:0 6px;font-weight:700}
+.asm{min-width:120px;min-height:42px;border:3px dashed var(--main);border-radius:12px;padding:4px 12px;font-size:1.3rem;font-weight:700;display:inline-block}
+.pc{background:var(--acc);color:#2a2140;font-size:1.2rem;margin:2px}
+.pc:disabled{opacity:.3}
+.fb{font-weight:700;margin-top:8px;min-height:1.4em}
+.stars{font-size:1.5rem;letter-spacing:3px}
+.final{display:none;text-align:center}
+.badge{font-size:4rem}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.95rem}
+td,th{border:1px solid var(--line);padding:6px;text-align:center}
+.ae button{margin:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="hero">
+  <div class="big">🔎✏️🌉</div>
+  <h1>Vânătorii de cratime</h1>
+  <p>Cratima, mica punte dintre cuvinte, a dispărut din Țara Cuvintelor! Detectivi ortografici, ajutați-o să se întoarcă la locul ei. Treceți cele 5 probe!</p>
+  <label>Numele detectivului: <input id="nm" placeholder="scrie-ți numele"></label>
+  <div class="vr">Varianta: <button id="vA" class="on">A</button><button id="vB">B</button></div>
+ </div>
+ <div class="bar"><i id="pb"></i></div>
+ <div id="items"></div>
+ <div class="card final" id="fin">
+  <div class="badge" id="bd"></div>
+  <h2 id="ft"></h2><p id="fn"></p>
+  <table><tr><th>Proba</th><th>Rezultat</th><th>Autoevaluare (cum crezi că ai lucrat?)</th></tr><tbody id="tb"></tbody></table>
+  <button class="go" id="again">🔁 Încearcă cealaltă variantă</button>
+ </div>
+</div>
+<script>
+var V={
+A:{
+ i1:[["Maria {} întors de la bunici.","s-a","sa"],["Ion {} dat o carte prietenului său.","i-a","ia"],["Mama {} rugat să o ajut.","m-a","ma"],["{} mingea și hai la joc!","Ia","I-a"],["Profesorul {} lăudat pe Andrei.","l-a","la"],["Fratele meu {} ajutat la teme.","ne-a","nea"]],
+ i2:[["Am intrat {} casă veche.","într-o"],["Broscuța a sărit {} baltă.","dintr-o"],["Drumul trece {} pădure frumoasă.","printr-o"],["Ea vine {} prietenă.","c-o"],["Am luat un măr {} coș.","dintr-un"],["Pisica doarme {} fotoliu.","într-un"]],
+ i3:[["Fratele ","sa"," întors târziu acasă.","s-a"],["Mama ","ia"," cumpărat o jucărie.","i-a"],["","Dă mi"," cartea, te rog!","dă-mi"],["","Spune ne"," ce ai văzut.","spune-ne"],["Am plecat ","într o"," excursie.","într-o"]],
+ i4:[["dă","-","mi"],["ia","-","l"],["sud","-","est"],["Piatra","-","Neamț"],["alb","-","negru"]],
+ i5:["dă-mi","s-a","într-o"]},
+B:{
+ i1:[["Ana {} trezit devreme.","s-a","sa"],["Bunica {} pregătit o prăjitură.","i-a","ia"],["Colegul {} invitat la ziua lui.","m-a","ma"],["{} caietul de pe bancă!","Ia","I-a"],["Câinele {} urmărit pe băiat.","l-a","la"],["Învățătoarea {} citit o poveste.","ne-a","nea"]],
+ i2:[["Ne-am oprit {} sat mic.","într-un"],["Pisica a ieșit {} cutie.","dintr-o"],["Râul curge {} oraș mare.","printr-un"],["Merg la bunica {} prietenă.","c-o"],["Mingea a căzut {} copac.","dintr-un"],["Am trecut {} pădure.","printr-o"]],
+ i3:[["Bunicul ","sa"," așezat în fotoliu.","s-a"],["Tata ","ia"," explicat tema.","i-a"],["","Ajută mă",", te rog!","ajută-mă"],["","Spune mi"," unde ai fost.","spune-mi"],["Am venit ","dintr o"," localitate mică.","dintr-o"]],
+ i4:[["spune","-","mi"],["fă","-","o"],["nord","-","vest"],["Cluj","-","Napoca"],["ajută","-","mă"]],
+ i5:["i-a","spune-mi","dintr-un"]}
+};
+var L=["Mai încearcă","Suficient","Bine","Foarte bine"],cur="A",res=[],chk=[];
+var IT=[
+ {tag:"Proba 1 · Puntea alegerilor",h:"Alege scrierea corectă",tip:"Când cuvântul „a” se lipește de un cuvânt mic dinaintea lui, punem cratimă: s-a întors, i-a dat. „Ia” fără cratimă înseamnă „a lua”: Ia mingea!",model:"Exemplu: Ion ___ întors acasă. → s-a",thr:[3,5,6]},
+ {tag:"Proba 2 · Seiful cu cuvinte",h:"Deschide seiful: alege forma corectă",tip:"Două cuvinte se unesc cu o punte: în + o = într-o, dintr-o, printr-o, cu + o = c-o.",model:"Exemplu: Pisica a intrat ___ cutie. → într-o",thr:[3,5,6]},
+ {tag:"Proba 3 · Detectivul de greșeli",h:"Găsește greșeala și rescrie corect",tip:"Cuvintele colorate cu roșu sunt scrise greșit. Rescrie doar partea colorată, cu cratimă unde trebuie.",model:"Exemplu: Fata sa trezit. → s-a",thr:[3,4,5]},
+ {tag:"Proba 4 · Constructorul de punți",h:"Construiește cuvântul din bucăți",tip:"Apasă bucățile în ordinea corectă. Nu uita puntea (-) dintre ele!",model:"Exemplu: nord + - + est → nord-est",thr:[3,4,5]},
+ {tag:"Proba 5 · Povestitorul",h:"Scrie câte un enunț cu cuvântul dat",tip:"Un enunț are minimum 4 cuvinte și conține cuvântul cerut, scris corect. Învățătorul verifică la final cât de bine sunt scrise propozițiile tale.",model:"Exemplu: cu „dă-mi” → Dă-mi, te rog, un creion!",thr:[1,2,3]}
+];
+function sh(a){return a.slice().sort(function(){return Math.random()-.5})}
+function norm(s){return s.toLowerCase().replace(/[\u2010-\u2015\u2212]/g,"-").replace(/\s+/g," ").trim()}
+function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e}
+function mark(r,ok,txt){r.classList.add(ok?"right":"wrong");var s=el("small","",ok?"✔ Corect!":"✘ Corect era: "+txt);r.appendChild(s)}
+function lvl(n,t){return n>=t[2]?3:n>=t[1]?2:n>=t[0]?1:0}
+
+function build(){
+ var d=V[cur],box=document.getElementById("items");box.innerHTML="";res=[null,null,null,null,null];chk=[];
+ document.getElementById("pb").style.width="0";document.getElementById("fin").style.display="none";
+ IT.forEach(function(it,i){
+  var c=el("div","card");
+  c.innerHTML='<span class="tag">'+it.tag+'</span><h2>'+it.h+'</h2><details><summary>💡 Trucul detectivului</summary>'+it.tip+'</details><div class="model">'+it.model+'</div>';
+  var body=el("div");c.appendChild(body);
+  var fb=el("div","fb");var b=el("button","go","Verifică proba");
+  var fn=MK[i](body,d["i"+(i+1)]);
+  b.onclick=function(){var n=fn();b.disabled=true;var l=lvl(n.n,it.thr);res[i]=l;
+   fb.innerHTML='<span class="stars">'+"⭐".repeat(l)+"☆".repeat(3-l)+'</span> '+L[l]+" — "+n.n+" din "+n.t;
+   var done=res.filter(function(x){return x!==null}).length;document.getElementById("pb").style.width=done*20+"%";
+   if(done==5)finish()};
+  c.appendChild(b);c.appendChild(fb);box.appendChild(c)})
+}
+var MK=[
+ function(box,q){var rows=[];q.forEach(function(x){var r=el("div","row"),p=x[0].split("{}");
+   r.appendChild(el("span","",p[0]));var o=sh([x[1],x[2]]);
+   o.forEach(function(v){var bt=el("button","op",v);bt.onclick=function(){r.dataset.s=v;r.querySelectorAll(".op").forEach(function(z){z.classList.remove("on")});bt.classList.add("on")};r.appendChild(bt)});
+   r.appendChild(el("span","",p[1]));box.appendChild(r);rows.push([r,x[1]])});
+  return function(){var n=0;rows.forEach(function(z){var ok=z[0].dataset.s===z[1];if(ok)n++;mark(z[0],ok,z[1])});return{n:n,t:rows.length}}},
+ function(box,q){var rows=[];q.forEach(function(x){var r=el("div","row"),p=x[0].split("{}");
+   r.appendChild(el("span","",p[0]));var s=el("select");s.innerHTML="<option value=''>alege…</option>";
+   sh([x[1],x[1].replace(/-/g," "),x[1].replace(/-/g,"")]).forEach(function(v){s.innerHTML+="<option>"+v+"</option>"});
+   r.appendChild(s);r.appendChild(el("span","",p[1]));box.appendChild(r);rows.push([r,s,x[1]])});
+  return function(){var n=0;rows.forEach(function(z){var ok=z[1].value===z[2];if(ok)n++;mark(z[0],ok,z[2])});return{n:n,t:rows.length}}},
+ function(box,q){var rows=[];q.forEach(function(x){var r=el("div","row");
+   r.appendChild(el("span","",x[0]+'<span class="wr">'+x[1]+"</span>"+x[2]));
+   var i=el("input","t");i.placeholder="scrie corect";r.appendChild(i);box.appendChild(r);rows.push([r,i,x[3]])});
+  return function(){var n=0;rows.forEach(function(z){var ok=norm(z[1].value)===z[2];if(ok)n++;mark(z[0],ok,z[2])});return{n:n,t:rows.length}}},
+ function(box,q){var rows=[];q.forEach(function(x){var r=el("div","row"),a=el("span","asm"),tgt=x.join(""),st=[];
+   var pc=el("span");var bs=[];
+   function draw(){a.textContent=st.map(function(k){return x[k]}).join("");bs.forEach(function(b,k){b.disabled=st.indexOf(k)>-1})}
+   sh(x.map(function(v,k){return k})).forEach(function(k){var b=el("button","pc",x[k]);bs[k]=b;b.onclick=function(){st.push(k);draw()};pc.appendChild(b)});
+   var rs=el("button","op","↺");rs.onclick=function(){st=[];draw()};
+   r.appendChild(a);r.appendChild(pc);r.appendChild(rs);box.appendChild(r);rows.push([r,function(){return a.textContent},tgt])});
+  return function(){var n=0;rows.forEach(function(z){var ok=z[1]()===z[2];if(ok)n++;mark(z[0],ok,z[2])});return{n:n,t:rows.length}}},
+ function(box,q){var rows=[];q.forEach(function(w){var r=el("div","row");r.appendChild(el("span","","Scrie un enunț cu <b>„"+w+"”</b>:"));
+   var t=el("textarea");t.rows=2;r.appendChild(t);box.appendChild(r);rows.push([r,t,w])});
+  return function(){var n=0;rows.forEach(function(z){var v=norm(z[1].value),ok=v.indexOf(z[2])>-1&&v.split(" ").filter(Boolean).length>=4;if(ok)n++;mark(z[0],ok,"un enunț de minimum 4 cuvinte, care conține „"+z[2]+"”")});return{n:n,t:rows.length}}}
+];
+var names=["Puntea alegerilor","Seiful cu cuvinte","Detectivul de greșeli","Constructorul de punți","Povestitorul"];
+function finish(){
+ var tot=res.reduce(function(a,b){return a+b},0),g=tot>=13?3:tot>=8?2:1;
+ var nm=document.getElementById("nm").value.trim()||"Detectiv";
+ document.getElementById("fin").style.display="block";
+ document.getElementById("bd").textContent=["","🥉","🥈","🏆"][g];
+ document.getElementById("ft").textContent=["","Detectiv Începător","Detectiv Priceput","Maestrul Cratimei"][g]+" — "+nm;
+ document.getElementById("fn").textContent="Ai strâns "+tot+" puncte din 15. Cratima s-a întors în Țara Cuvintelor datorită ție!";
+ var tb=document.getElementById("tb");tb.innerHTML="";
+ names.forEach(function(n,i){var tr=el("tr","","<td>"+n+"</td><td>"+"⭐".repeat(res[i])+" "+L[res[i]]+"</td>"),td=el("td","ae");
+  ["Suficient","Bine","Foarte bine"].forEach(function(lb,k){var b=el("button","op",["S","B","FB"][k]);b.title=lb;
+   b.onclick=function(){td.querySelectorAll(".op").forEach(function(z){z.classList.remove("on")});b.classList.add("on");
+    var m=td.querySelector("em");if(m)m.remove();td.appendChild(el("em","",(k+1==res[i]||(res[i]==0&&k==0))?" 🎯 Te cunoști bine!":" 🤔 Compară cu rezultatul."))};td.appendChild(b)});
+  tr.appendChild(td);tb.appendChild(tr)});
+ document.getElementById("fin").scrollIntoView({behavior:"smooth"});
+}
+function setV(v){cur=v;document.getElementById("vA").classList.toggle("on",v=="A");document.getElementById("vB").classList.toggle("on",v=="B");build()}
+document.getElementById("vA").onclick=function(){setV("A")};
+document.getElementById("vB").onclick=function(){setV("B")};
+document.getElementById("again").onclick=function(){setV(cur=="A"?"B":"A");window.scrollTo({top:0,behavior:"smooth"})};
+build();
+</script>
+</body>
+</html>
